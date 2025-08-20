@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário - Nossas Metas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        header {
+            background: #4e54c8;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #4e54c8;
+            color: #4e54c8;
+        }
+        
+        .calendar-container {
+            padding: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            background: #4e54c8;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background: #3a3eb3;
+        }
+        
+        .current-month {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4e54c8;
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .weekdays div {
+            padding: 10px;
+        }
+        
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .day {
+            height: 100px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            overflow-y: auto;
+        }
+        
+        .day:hover {
+            background: #e9ecef;
+        }
+        
+        .day.other-month {
+            background: #f1f3f5;
+            color: #adb5bd;
+        }
+        
+        .day.has-events {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+        }
+        
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .event-dot {
+            width: 8px;
+            height: 8px;
+            background: #4e54c8;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 3px;
+        }
+        
+        .event-item {
+            font-size: 0.75rem;
+            padding: 3px 5px;
+            background: #4e54c8;
+            color: white;
+            border-radius: 4px;
+            margin-top: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .event-form {
+            padding: 20px;
+            border-top: 1px solid #dee2e6;
+            background: #f8f9fa;
+        }
+        
+        .event-form h3 {
+            margin-bottom: 15px;
+            color: #4e54c8;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: #4e54c8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #3a3eb3;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+        }
+        
+        .btn-delete:hover {
+            background: #bd2130;
+        }
+        
+        .events-list {
+            margin-top: 20px;
+        }
+        
+        .events-list h3 {
+            margin-bottom: 10px;
+            color: #4e54c8;
+        }
+        
+        .event-card {
+            background: white;
+            border-left: 4px solid #4e54c8;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .event-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .event-date {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .event-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .day {
+                height: 70px;
+                padding: 5px;
+                font-size: 0.9rem;
+            }
+            
+            .event-item {
+                font-size: 0.7rem;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1;
+                text-align: center;
+                padding: 12px 5px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Que todas as nossas metas sejam possíveis!</h1>
+            <p>Nosso calendário compartilhado</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab" onclick="location.href='fotos.html'">Fotos</div>
+            <div class="tab" onclick="location.href='lista.html'">Lista</div>
+            <div class="tab active">Calendário</div>
+        </div>
+        
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="month-nav">
+                    <button class="nav-btn" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                    <h2 class="current-month" id="current-month">Maio 2023</h2>
+                    <button class="nav-btn" id="next-month"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <button class="btn" id="today-btn">Hoje</button>
+            </div>
+            
+            <div class="weekdays">
+                <div>Dom</div>
+                <div>Seg</div>
+                <div>Ter</div>
+                <div>Qua</div>
+                <div>Qui</div>
+                <div>Sex</div>
+                <div>Sáb</div>
+            </div>
+            
+            <div class="days" id="calendar-days">
+                <!-- Os dias do calendário serão gerados via JavaScript -->
+                <div class="loading" id="loading-calendar">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando calendário...
+                </div>
+            </div>
+            
+            <div class="event-form">
+                <h3 id="form-title">Adicionar novo evento</h3>
+                <div class="form-group">
+                    <label for="event-date">Data</label>
+                    <input type="date" id="event-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-title">Título do evento</label>
+                    <input type="text" id="event-title" placeholder="Nome do evento" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-desc">Descrição (opcional)</label>
+                    <textarea id="event-desc" placeholder="Detalhes do evento"></textarea>
+                </div>
+                <button class="btn" id="save-event">Salvar evento</button>
+                <button class="btn btn-delete" id="delete-event" style="display: none;">Excluir evento</button>
+            </div>
+            
+            <div class="events-list">
+                <h3>Próximos eventos</h3>
+                <div id="events-container">
+                    <div class="loading" id="loading-events">
+                        <i class="fas fa-spinner fa-spin"></i> Carregando eventos...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 — M&A</p>
+    </footer>
+
+    <!-- Firebase (apenas os SDKs necessários, a inicialização está no common.js) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/common.js"></script>
+
+    <script>
+        // Verificar se o Firebase foi inicializado
+        function checkFirebaseInitialization() {
+            return new Promise((resolve, reject) => {
+                // Verificar se o Firebase já foi inicializado
+                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                    resolve();
+                    return;
+                }
+                
+                // Esperar um pouco e tentar novamente
+                let attempts = 0;
+                const checkInterval = setInterval(() => {
+                    attempts++;
+                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    } else if (attempts > 10) {
+                        clearInterval(checkInterval);
+                        reject(new Error('Firebase não foi inicializado. Verifique o common.js.'));
+                    }
+                }, 100);
+            });
+        }
+
+        // Variáveis globais
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        let selectedDate = null;
+        let editingEventId = null;
+        
+        // Elementos do DOM
+        const calendarDays = document.getElementById('calendar-days');
+        const currentMonthElement = document.getElementById('current-month');
+        const prevMonthButton = document.getElementById('prev-month');
+        const nextMonthButton = document.getElementById('next-month');
+        const todayButton = document.getElementById('today-btn');
+        const eventDateInput = document.getElementById('event-date');
+        const eventTitleInput = document.getElementById('event-title');
+        const eventDescInput = document.getElementById('event-desc');
+        const saveEventButton = document.getElementById('save-event');
+        const deleteEventButton = document.getElementById('delete-event');
+        const eventsContainer = document.getElementById('events-container');
+        const formTitle = document.getElementById('form-title');
+        const loadingCalendar = document.getElementById('loading-calendar');
+        const loadingEvents = document.getElementById('loading-events');
+        
+        // Nomes dos meses
+        const monthNames = [
+            "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+        ];
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se o Firebase foi inicializado antes de continuar
+            checkFirebaseInitialization()
+                .then(() => {
+                    // Inicializar a aplicação após o Firebase estar pronto
+                    initApp();
+                })
+                .catch((error) => {
+                    console.error("Erro na inicialização do Firebase:", error);
+                    loadingCalendar.innerHTML = "Erro ao conectar com o banco de dados. Verifique o console para detalhes.";
+                    loadingEvents.innerHTML = "Erro ao carregar eventos.";
+                });
+        });
+        
+        function initApp() {
+            renderCalendar();
+            loadEvents();
+            
+            // Event Listeners
+            prevMonthButton.addEventListener('click', function() {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar();
+                loadEvents();
+            });
+            
+            nextMonthButton.addEventListener('click', function() {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderCalendar();
+                loadEvents();
+            });
+            
+            todayButton.addEventListener('click', function() {
+                currentDate = new Date();
+                currentMonth = currentDate.getMonth();
+                currentYear = currentDate.getFullYear();
+                renderCalendar();
+                loadEvents();
+            });
+            
+            saveEventButton.addEventListener('click', saveEvent);
+            deleteEventButton.addEventListener('click', deleteEvent);
+            
+            // Definir data atual como padrão no formulário
+            const today = new Date();
+            const formattedToday = today.toISOString().split('T')[0];
+            eventDateInput.value = formattedToday;
+        }
+        
+        // Renderizar calendário
+        function renderCalendar() {
+            loadingCalendar.style.display = 'none';
+            calendarDays.innerHTML = '';
+            currentMonthElement.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startDay = firstDay.getDay();
+            
+            // Dias do mês anterior
+            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+            for (let i = startDay - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'day other-month';
+                day.textContent = prevMonthLastDay - i;
+                calendarDays.appendChild(day);
+            }
+            
+            // Dias do mês atual
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'day';
+                
+                // Destacar o dia atual
+                if (i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+                    day.style.background = '#ffeeba';
+                }
+                
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = i;
+                day.appendChild(dayNumber);
+                
+                day.setAttribute('data-date', `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`);
+                day.addEventListener('click', function() {
+                    selectDate(this.getAttribute('data-date'));
+                });
+                
+                calendarDays.appendChild(day);
+            }
+            
+            // Dias do próximo mês
+            const totalCells = 42; // 6 semanas * 7 dias
+            const remainingCells = totalCells - (startDay + daysInMonth);
+            for (let i = 1; i <= remainingCells; i++) {
+                const day = document.createElement('div');
+                day.className = 'day other-month';
+                day.textContent = i;
+                calendarDays.appendChild(day);
+            }
+        }
+        
+        // Selecionar data
+        function selectDate(dateString) {
+            selectedDate = dateString;
+            eventDateInput.value = dateString;
+            
+            // Destacar o dia selecionado
+            document.querySelectorAll('.day').forEach(day => {
+                day.style.border = 'none';
+            });
+            
+            const selectedDay = document.querySelector(`.day[data-date="${dateString}"]`);
+            if (selectedDay) {
+                selectedDay.style.border = '2px solid #4e54c8';
+            }
+            
+            // Limpar formulário
+            eventTitleInput.value = '';
+            eventDescInput.value = '';
+            editingEventId = null;
+            deleteEventButton.style.display = 'none';
+            formTitle.textContent = 'Adicionar novo evento';
+        }
+        
+        // Carregar eventos do Firebase
+        function loadEvents() {
+            // Limpar eventos existentes
+            document.querySelectorAll('.event-dot').forEach(dot => dot.remove());
+            document.querySelectorAll('.event-item').forEach(item => item.remove());
+            
+            // Buscar eventos do mês atual
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+            const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+            
+            db.collection('events')
+                .where('date', '>=', firstDayOfMonth.toISOString().split('T')[0])
+                .where('date', '<=', lastDayOfMonth.toISOString().split('T')[0])
+                .get()
+                .then((querySnapshot) => {
+                    loadingEvents.style.display = 'none';
+                    querySnapshot.forEach((doc) => {
+                        const event = doc.data();
+                        displayEventOnCalendar(event);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar eventos: ", error);
+                    loadingEvents.innerHTML = "Erro ao carregar eventos. Verifique o console para detalhes.";
+                });
+                
+            // Carregar próximos eventos
+            const today = new Date().toISOString().split('T')[0];
+            
+            db.collection('events')
+                .where('date', '>=', today)
+                .orderBy('date')
+                .limit(5)
+                .get()
+                .then((querySnapshot) => {
+                    eventsContainer.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        eventsContainer.innerHTML = '<p>Nenhum evento futuro</p>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const event = doc.data();
+                        displayEventInList(event, doc.id);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar próximos eventos: ", error);
+                    eventsContainer.innerHTML = '<p>Erro ao carregar eventos</p>';
+                });
+        }
+        
+        // Exibir evento no calendário
+        function displayEventOnCalendar(event) {
+            const dateParts = event.date.split('-');
+            const eventDay = parseInt(dateParts[2]);
+            
+            const dayElement = document.querySelector(`.day[data-date="${event.date}"]`);
+            if (dayElement) {
+                dayElement.classList.add('has-events');
+                
+                const eventDot = document.createElement('span');
+                eventDot.className = 'event-dot';
+                dayElement.querySelector('.day-number').appendChild(eventDot);
+                
+                const eventItem = document.createElement('div');
+                eventItem.className = 'event-item';
+                eventItem.textContent = event.title;
+                eventItem.setAttribute('data-event-id', event.id);
+                eventItem.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    editEvent(event.id);
+                });
+                
+                dayElement.appendChild(eventItem);
+            }
+        }
+        
+        // Exibir evento na lista
+        function displayEventInList(event, id) {
+            const eventCard = document.createElement('div');
+            eventCard.className = 'event-card';
+            eventCard.innerHTML = `
+                <div class="event-title">${event.title}</div>
+                <div class="event-date">${formatDate(event.date)}</div>
+                <div class="event-actions">
+                    <button class="btn" onclick="editEvent('${id}')">Editar</button>
+                    <button class="btn btn-delete" onclick="deleteEvent('${id}')">Excluir</button>
+                </div>
+            `;
+            
+            eventsContainer.appendChild(eventCard);
+        }
+        
+        // Formatar data para exibição
+        function formatDate(dateString) {
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            return new Date(dateString).toLocaleDateString('pt-BR', options);
+        }
+        
+        // Salvar evento
+        function saveEvent() {
+            const date = eventDateInput.value;
+            const title = eventTitleInput.value;
+            const description = eventDescInput.value;
+            
+            if (!date || !title) {
+                alert('Por favor, preencha pelo menos a data e o título do evento.');
+                return;
+            }
+            
+            const eventData = {
+                date: date,
+                title: title,
+                description: description,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            if (editingEventId) {
+                // Atualizar evento existente
+                db.collection('events').doc(editingEventId).update(eventData)
+                    .then(() => {
+                        alert('Evento atualizado com sucesso!');
+                        resetForm();
+                        loadEvents();
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao atualizar evento: ", error);
+                    });
+            } else {
+                // Adicionar novo evento
+                db.collection('events').add(eventData)
+                    .then(() => {
+                        alert('Evento adicionado com sucesso!');
+                        resetForm();
+                        loadEvents();
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao adicionar evento: ", error);
+                    });
+            }
+        }
+        
+        // Editar evento
+        function editEvent(eventId) {
+            db.collection('events').doc(eventId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const event = doc.data();
+                        eventDateInput.value = event.date;
+                        eventTitleInput.value = event.title;
+                        eventDescInput.value = event.description || '';
+                        
+                        editingEventId = eventId;
+                        deleteEventButton.style.display = 'inline-block';
+                        formTitle.textContent = 'Editar evento';
+                        
+                        // Rolar até o formulário
+                        eventDateInput.scrollIntoView({ behavior: 'smooth' });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar evento: ", error);
+                });
+        }
+        
+        // Excluir evento
+        function deleteEvent(eventId = null) {
+            const idToDelete = eventId || editingEventId;
+            
+            if (!idToDelete) {
+                alert('Nenhum evento selecionado para exclusão.');
+                return;
+            }
+            
+            if (confirm('Tem certeza que deseja excluir este evento?')) {
+                db.collection('events').doc(idToDelete).delete()
+                    .then(() => {
+                        alert('Evento excluído com sucesso!');
+                        resetForm();
+                        loadEvents();
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao excluir evento: ", error);
+                    });
+            }
+        }
+        
+        // Reiniciar formulário
+        function resetForm() {
+            eventTitleInput.value = '';
+            eventDescInput.value = '';
+            editingEventId = null;
+            deleteEventButton.style.display = 'none';
+            formTitle.textContent = 'Adicionar novo evento';
+            
+            // Definir data atual como padrão
+            const today = new Date();
+            const formattedToday = today.toISOString().split('T')[0];
+            eventDateInput.value = formattedToday;
+        }
+    </script>
+</body>
+</html>

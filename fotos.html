@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fotos - Nossas Metas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        header {
+            background: #0083b0;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #0083b0;
+            color: #0083b0;
+        }
+        
+        .photos-container {
+            padding: 20px;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .upload-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #0083b0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin: 10px 0;
+        }
+        
+        .upload-btn:hover {
+            background: #006d96;
+        }
+        
+        .upload-btn i {
+            margin-right: 8px;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .upload-status {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: #0083b0;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .photo-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            aspect-ratio: 1/1;
+        }
+        
+        .photo-card:hover {
+            transform: scale(1.03);
+        }
+        
+        .photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .photo-card:hover .photo-overlay {
+            opacity: 1;
+        }
+        
+        .photo-date {
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .photo-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .photo-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+        
+        .photo-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+            grid-column: 1 / -1;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ced4da;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1;
+                text-align: center;
+                padding: 12px 5px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Que todas as nossas metas sejam possíveis!</h1>
+            <p>Nosso mural de fotos compartilhado</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active">Fotos</div>
+            <div class="tab" onclick="location.href='lista.html'">Lista</div>
+            <div class="tab" onclick="location.href='calendario.html'">Calendário</div>
+        </div>
+        
+        <div class="photos-container">
+            <div class="upload-section">
+                <h3>Adicionar foto ao mural</h3>
+                <input type="file" id="file-input" accept="image/*">
+                <label for="file-input" class="upload-btn">
+                    <i class="fas fa-upload"></i> Escolher Foto
+                </label>
+                <div class="upload-status" id="upload-status">Nenhuma foto selecionada</div>
+                <div class="progress-bar">
+                    <div class="progress" id="upload-progress"></div>
+                </div>
+            </div>
+            
+            <div class="gallery" id="photos-gallery">
+                <div class="empty-state" id="empty-state">
+                    <i class="fas fa-camera"></i>
+                    <h3>Nenhuma foto ainda</h3>
+                    <p>Adicione a primeira foto para começar o mural</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para visualização de imagem -->
+    <div class="modal" id="image-modal">
+        <span class="modal-close" id="modal-close">&times;</span>
+        <img class="modal-content" id="modal-image">
+    </div>
+    
+    <footer>
+        <p>© 2025 — M&A</p>
+    </footer>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="js/common.js"></script>
+
+    <script>
+        // Inicializar Firebase Storage
+        const storage = firebase.storage();
+        
+        // Elementos do DOM
+        const fileInput = document.getElementById('file-input');
+        const uploadStatus = document.getElementById('upload-status');
+        const uploadProgress = document.getElementById('upload-progress');
+        const photosGallery = document.getElementById('photos-gallery');
+        const emptyState = document.getElementById('empty-state');
+        const imageModal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+        const modalClose = document.getElementById('modal-close');
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPhotos();
+            
+            // Event Listeners
+            fileInput.addEventListener('change', handleFileSelect);
+            modalClose.addEventListener('click', closeModal);
+            imageModal.addEventListener('click', function(e) {
+                if (e.target === imageModal) {
+                    closeModal();
+                }
+            });
+            
+            // Fechar modal com tecla ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        });
+        
+        // Manipular seleção de arquivo
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            
+            if (!file) {
+                return;
+            }
+            
+            // Verificar se é uma imagem
+            if (!file.type.match('image.*')) {
+                alert('Por favor, selecione apenas arquivos de imagem.');
+                return;
+            }
+            
+            // Verificar tamanho do arquivo (máximo 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('A imagem deve ter no máximo 5MB.');
+                return;
+            }
+            
+            uploadStatus.textContent = `Enviando: ${file.name}`;
+            uploadPhoto(file);
+        }
+        
+        // Fazer upload da foto
+        function uploadPhoto(file) {
+            // Gerar um ID único para a imagem
+            const photoId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            const storageRef = storage.ref().child('photos/' + photoId);
+            const uploadTask = storageRef.put(file);
+            
+            // Monitorar progresso do upload
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    // Progresso do upload
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    uploadProgress.style.width = progress + '%';
+                    
+                    if (progress === 100) {
+                        uploadStatus.textContent = 'Processando...';
+                    }
+                },
+                (error) => {
+                    // Erro no upload
+                    console.error('Erro no upload:', error);
+                    uploadStatus.textContent = 'Erro ao enviar foto. Tente novamente.';
+                    uploadProgress.style.width = '0%';
+                },
+                () => {
+                    // Upload completo
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        // Salvar metadados no Firestore
+                        savePhotoData(photoId, downloadURL, file.name);
+                    });
+                }
+            );
+        }
+        
+        // Salvar dados da foto no Firestore
+        function savePhotoData(photoId, downloadURL, fileName) {
+            db.collection('photos').doc(photoId).set({
+                name: fileName,
+                url: downloadURL,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdBy: 'user' // Em uma app real, você usaria o ID do usuário
+            })
+            .then(() => {
+                uploadStatus.textContent = 'Foto enviada com sucesso!';
+                uploadProgress.style.width = '0%';
+                fileInput.value = '';
+                
+                // Recarregar galeria
+                loadPhotos();
+            })
+            .catch((error) => {
+                console.error('Erro ao salvar dados da foto:', error);
+                uploadStatus.textContent = 'Erro ao salvar dados da foto.';
+            });
+        }
+        
+        // Carregar fotos do Firebase
+        function loadPhotos() {
+            db.collection('photos').orderBy('createdAt', 'desc').get()
+            .then((querySnapshot) => {
+                photosGallery.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    emptyState.style.display = 'block';
+                    photosGallery.appendChild(emptyState);
+                    return;
+                }
+                
+                emptyState.style.display = 'none';
+                
+                querySnapshot.forEach((doc) => {
+                    const photo = doc.data();
+                    displayPhoto(photo, doc.id);
+                });
+            })
+            .catch((error) => {
+                console.error('Erro ao carregar fotos:', error);
+                photosGallery.innerHTML = '<div class="empty-state"><p>Erro ao carregar fotos</p></div>';
+            });
+        }
+        
+        // Exibir foto na galeria
+        function displayPhoto(photo, id) {
+            const photoCard = document.createElement('div');
+            photoCard.className = 'photo-card';
+            
+            // Formatar data
+            let photoDate = 'Data desconhecida';
+            if (photo.createdAt) {
+                const date = photo.createdAt.toDate();
+                photoDate = date.toLocaleDateString('pt-BR');
+            }
+            
+            photoCard.innerHTML = `
+                <img src="${photo.url}" alt="${photo.name}" class="photo">
+                <div class="photo-overlay">
+                    <div class="photo-date">${photoDate}</div>
+                    <div class="photo-actions">
+                        <button class="photo-btn view-btn" data-id="${id}">
+                            <i class="fas fa-expand"></i> Ampliar
+                        </button>
+                        <button class="photo-btn delete-btn" data-id="${id}">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Event listeners para os botões
+            const viewBtn = photoCard.querySelector('.view-btn');
+            viewBtn.addEventListener('click', function() {
+                viewPhoto(photo.url);
+            });
+            
+            const deleteBtn = photoCard.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', function() {
+                deletePhoto(id, photo.url);
+            });
+            
+            photosGallery.appendChild(photoCard);
+        }
+        
+        // Visualizar foto em tela cheia
+        function viewPhoto(url) {
+            modalImage.src = url;
+            imageModal.style.display = 'flex';
+        }
+        
+        // Fechar modal
+        function closeModal() {
+            imageModal.style.display = 'none';
+        }
+        
+        // Excluir foto
+        function deletePhoto(photoId, photoUrl) {
+            if (!confirm('Tem certeza que deseja excluir esta foto?')) {
+                return;
+            }
+            
+            // Extrair o caminho do arquivo no Storage a partir da URL
+            const storageRef = storage.refFromURL(photoUrl);
+            
+            // Excluir do Storage
+            storageRef.delete().then(() => {
+                // Excluir do Firestore
+                return db.collection('photos').doc(photoId).delete();
+            }).then(() => {
+                // Recarregar galeria
+                loadPhotos();
+            }).catch((error) => {
+                console.error('Erro ao excluir foto:', error);
+                alert('Erro ao excluir foto. Tente novamente.');
+            });
+        }
+    </script>
+</body>
+</html>
