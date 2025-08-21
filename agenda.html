@@ -186,16 +186,16 @@
         .time-slots {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            max-height: 600px;
+            gap: 8px;
+            max-height: 650px;
             overflow-y: auto;
         }
         
         .time-slot {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px;
+            gap: 8px;
+            padding: 8px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -223,6 +223,17 @@
             color: #6c757d;
             font-style: italic;
             justify-content: center;
+        }
+        
+        .event-content.fixed {
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+        
+        .event-content.fixed::after {
+            content: " (Fixo)";
+            font-size: 0.7em;
+            opacity: 0.7;
         }
         
         .add-event-btn {
@@ -592,7 +603,8 @@
         function populateTimeOptions() {
             eventTimeSelect.innerHTML = '';
             
-            for (let hour = 6; hour <= 22; hour++) {
+            // Alterado: hora inicial de 5 para 5 e final de 22 para 23
+            for (let hour = 5; hour <= 23; hour++) {
                 for (let minute = 0; minute < 60; minute += 30) {
                     const timeValue = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
                     const option = document.createElement('option');
@@ -601,6 +613,12 @@
                     eventTimeSelect.appendChild(option);
                 }
             }
+            
+            // Adicionar meia-noite (00:00)
+            const midnightOption = document.createElement('option');
+            midnightOption.value = '00:00';
+            midnightOption.textContent = '00:00';
+            eventTimeSelect.appendChild(midnightOption);
             
             // Definir horário padrão
             const now = new Date();
@@ -618,8 +636,8 @@
             // Limpar os slots de tempo
             timeSlotsContainer.innerHTML = '';
             
-            // Gerar slots de tempo (das 6h às 22h)
-            for (let hour = 6; hour <= 22; hour++) {
+            // Alterado: hora inicial de 5 para 5 e final de 22 para 23
+            for (let hour = 5; hour <= 23; hour++) {
                 for (let minute = 0; minute < 60; minute += 30) {
                     const timeValue = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
                     
@@ -648,6 +666,79 @@
                     });
                     
                     timeSlotsContainer.appendChild(timeSlot);
+                }
+            }
+            
+            // Adicionar slot para meia-noite (00:00)
+            const midnightSlot = document.createElement('div');
+            midnightSlot.className = 'time-slot';
+            midnightSlot.setAttribute('data-time', '00:00');
+            
+            midnightSlot.innerHTML = `
+                <div class="time-label">00:00</div>
+                <div class="event-content empty" data-time="00:00">Clique para adicionar evento</div>
+                <button class="add-event-btn" data-time="00:00">+</button>
+            `;
+            
+            const midnightEventContent = midnightSlot.querySelector('.event-content');
+            const midnightAddButton = midnightSlot.querySelector('.add-event-btn');
+            
+            midnightEventContent.addEventListener('click', function() {
+                const time = this.getAttribute('data-time');
+                editEventAtTime(time);
+            });
+            
+            midnightAddButton.addEventListener('click', function() {
+                const time = this.getAttribute('data-time');
+                addEventAtTime(time);
+            });
+            
+            timeSlotsContainer.appendChild(midnightSlot);
+        }
+
+        // Função para verificar se é dia de semana (segunda a sexta)
+        function isWeekday(date) {
+            const day = date.getDay();
+            return day >= 1 && day <= 5; // 1 = segunda, 5 = sexta
+        }
+
+        // Função para criar eventos fixos
+        function createFixedEvents() {
+            const formattedDate = selectedDate.toISOString().split('T')[0];
+            
+            // Verificar se é dia de semana
+            if (isWeekday(selectedDate)) {
+                // Criar evento fixo das 10:00 às 14:00
+                for (let hour = 10; hour < 14; hour++) {
+                    for (let minute = 0; minute < 60; minute += 30) {
+                        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                        const eventKey = `${formattedDate}_${time.replace(':', '')}`;
+                        
+                        // Verificar se o evento já existe
+                        db.collection('daily_schedule').doc(eventKey).get()
+                            .then((doc) => {
+                                if (!doc.exists) {
+                                    // Criar evento fixo
+                                    const eventData = {
+                                        date: formattedDate,
+                                        time: time,
+                                        title: "Trabalho",
+                                        description: "Horário de trabalho fixo",
+                                        color: "#4caf50", // Verde
+                                        isFixed: true,
+                                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                    };
+                                    
+                                    db.collection('daily_schedule').doc(eventKey).set(eventData)
+                                        .catch((error) => {
+                                            console.error("Erro ao criar evento fixo: ", error);
+                                        });
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Erro ao verificar evento fixo: ", error);
+                            });
+                    }
                 }
             }
         }
@@ -724,6 +815,13 @@
                 .then((doc) => {
                     if (doc.exists) {
                         const event = doc.data();
+                        
+                        // Verificar se é um evento fixo
+                        if (event.isFixed) {
+                            alert("Este é um evento fixo e não pode ser editado.");
+                            return;
+                        }
+                        
                         selectedTime = event.time;
                         eventTimeSelect.value = event.time;
                         eventTitleInput.value = event.title;
@@ -769,6 +867,9 @@
         function loadDayEvents() {
             const formattedDate = selectedDate.toISOString().split('T')[0];
             
+            // Criar eventos fixos para dias de semana
+            createFixedEvents();
+            
             // Buscar eventos do dia
             db.collection('daily_schedule')
                 .where('date', '==', formattedDate)
@@ -799,6 +900,12 @@
                 timeSlot.style.backgroundColor = event.color || '#6d5dfc';
                 timeSlot.textContent = event.title;
                 timeSlot.setAttribute('data-event-id', `${event.date}_${event.time.replace(':', '')}`);
+                
+                // Marcar eventos fixos
+                if (event.isFixed) {
+                    timeSlot.classList.add('fixed');
+                    timeSlot.title = "Evento fixo - não pode ser editado";
+                }
             }
         }
 

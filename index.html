@@ -1,32 +1,53 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nossas Metas</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nosso site</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <script defer src="js/common.js"></script>
 </head>
-<body>
-    <header>
-        <h1>Que todas as nossas metas sejam possíveis!</h1>
-        <h2>Escolha uma seção</h2>
-        <nav>
-    <ul>
-        <li><a href="fotos.html">Fotos</a></li>
-        <li><a href="lista.html">Lista</a></li>
-        <li><a href="calendario.html">Calendário</a></li>
-        <li><a href="agenda.html">Agenda</a></li> <!-- Novo botão -->
-    </ul>
-</nav>
-    </header>
+<body class="landing">
+  <header class="topbar">
+    <h1>Que todas  as nossas metas sejam possíveis!</h1>
+  </header>
 
-    <footer>
-        <p>© 2025 — M&A</p>
-    </footer>
+  <main class="landing-content">
+    <h2>Escolha uma seção</h2>
+    <nav class="buttons">
+      <a class="btn" href="fotos.html">Fotos</a>
+      <a class="btn" href="lista.html">Lista</a>
+      <a class="btn" href="calendario.html">Calendário</a>
+    </nav>
+  </main>
 
-    <script src="js/common.js"></script>
+  <footer class="footer">
+    <small>© <span id="year"></span> — M&A</small>
+  </footer>
+
+<!-- Firebase App (base SDK) -->
+<script type="module">
+  // Importando Firebase (v9 modular)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore.js";
+  import { getStorage } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-storage.js";
+
+  // 🚨 Substitua pelos dados do seu projeto Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyC10Hno92NmmXAW4jN251U1JLRQvRqn60E",
+    authDomain: "nosso-site-99c95.firebaseapp.com",
+    projectId: "nosso-site-99c95",
+    storageBucket: "nosso-site-99c95.appspot.com",
+    messagingSenderId: "173788414642",
+    appId: "1:173788414642:web:39efd3b0895f89e939ffab"
+  };
+
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app);
+  window.storage = getStorage(app);
+</script>
+
+
 </body>
 </html>
