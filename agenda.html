@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agenda - Nossas Metas</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -26,7 +26,7 @@
         
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1200px;
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -39,6 +39,7 @@
             color: white;
             padding: 20px;
             text-align: center;
+            position: relative;
         }
         
         header h1 {
@@ -49,6 +50,23 @@
         header p {
             font-size: 1.1rem;
             opacity: 0.9;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
         }
         
         .tabs {
@@ -119,76 +137,110 @@
             text-align: center;
         }
         
+        .view-options {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-btn {
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .view-btn.active {
+            background: #6d5dfc;
+            color: white;
+            border-color: #6d5dfc;
+        }
+        
         .agenda-content {
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1fr 350px;
             gap: 20px;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .agenda-content {
                 grid-template-columns: 1fr;
             }
         }
         
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
+        .day-view {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .selected-date {
+            text-align: center;
             margin-bottom: 20px;
-        }
-        
-        .day-header {
-            text-align: center;
+            font-size: 1.2rem;
+            color: #6d5dfc;
             font-weight: 600;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
         }
         
-        .day {
-            min-height: 100px;
+        .time-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .time-slot {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             padding: 10px;
-            background: #f8f9fa;
+            background: white;
             border-radius: 8px;
-            border: 1px solid #dee2e6;
-            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        .day-number {
+        .time-label {
+            min-width: 80px;
             font-weight: 600;
-            margin-bottom: 8px;
-            text-align: center;
-            padding: 4px;
+            color: #6c757d;
+        }
+        
+        .event-content {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .event-content.empty {
+            background: #e9ecef;
+            color: #6c757d;
+            font-style: italic;
+            justify-content: center;
+        }
+        
+        .add-event-btn {
+            background: #6d5dfc;
+            color: white;
+            border: none;
             border-radius: 50%;
             width: 30px;
             height: 30px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 8px;
+            transition: all 0.3s;
         }
         
-        .day.today .day-number {
-            background: #6d5dfc;
-            color: white;
-        }
-        
-        .day.other-month {
-            background: #f1f3f5;
-            color: #adb5bd;
-        }
-        
-        .event-item {
-            font-size: 0.8rem;
-            padding: 5px;
-            border-radius: 4px;
-            margin-top: 5px;
-            color: white;
-            cursor: pointer;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .add-event-btn:hover {
+            background: #5a4de0;
         }
         
         .event-form-panel {
@@ -341,70 +393,70 @@
                 flex-direction: column;
                 align-items: stretch;
             }
+            
+            .time-slot {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .time-label {
+                min-width: auto;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Que todas as nossas metas sejam possíveis!</h1>
-            <p>Nossa agenda personalizável</p>
             <a href="index.html" class="back-btn">← Voltar</a>
+            <h1>Que todas as nossas metas sejam possíveis!</h1>
+            <p>Nosso cronograma diário</p>
         </header>
         
         <div class="tabs">
             <div class="tab" onclick="location.href='fotos.html'">Fotos</div>
             <div class="tab" onclick="location.href='lista.html'">Lista</div>
             <div class="tab" onclick="location.href='calendario.html'">Calendário</div>
-            <div class="tab active">Agenda</div>
+            <div class="tab active">Cronograma</div>
         </div>
         
         <div class="agenda-container">
             <div class="agenda-header">
                 <div class="month-nav">
-                    <button class="nav-btn" id="prev-month"><i class="fas fa-chevron-left"></i></button>
-                    <h2 class="current-month" id="current-month">Agosto 2025</h2>
-                    <button class="nav-btn" id="next-month"><i class="fas fa-chevron-right"></i></button>
+                    <button class="nav-btn" id="prev-day"><i class="fas fa-chevron-left"></i></button>
+                    <h2 class="current-month" id="selected-date">20 de Agosto de 2025</h2>
+                    <button class="nav-btn" id="next-day"><i class="fas fa-chevron-right"></i></button>
                 </div>
-                <button class="btn" id="today-btn">Hoje</button>
+                <div class="view-options">
+                    <button class="view-btn" id="today-btn">Hoje</button>
+                    <input type="date" id="date-picker" style="padding: 8px; border-radius: 20px; border: 1px solid #ced4da;">
+                </div>
             </div>
             
             <div class="agenda-content">
-                <div>
-                    <div class="calendar" id="calendar">
-                        <!-- Cabeçalhos dos dias da semana -->
-                        <div class="day-header">Dom</div>
-                        <div class="day-header">Seg</div>
-                        <div class="day-header">Ter</div>
-                        <div class="day-header">Qua</div>
-                        <div class="day-header">Qui</div>
-                        <div class="day-header">Sex</div>
-                        <div class="day-header">Sáb</div>
-                        
-                        <!-- Dias do calendário serão gerados via JavaScript -->
-                    </div>
+                <div class="day-view">
+                    <div class="selected-date" id="day-title">Quinta-feira, 20 de Agosto de 2025</div>
                     
-                    <div class="events-list">
-                        <h3>Eventos de Agosto 2025</h3>
-                        <div id="events-container">
-                            <!-- Eventos serão carregados aqui -->
-                        </div>
+                    <div class="time-slots" id="time-slots">
+                        <!-- Os horários serão gerados via JavaScript -->
                     </div>
                 </div>
                 
                 <div class="event-form-panel">
                     <h3 id="form-title">Novo Evento</h3>
                     <div class="form-group">
+                        <label for="event-time">Horário</label>
+                        <select id="event-time">
+                            <!-- Os horários serão preenchidos via JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="event-title">Título</label>
                         <input type="text" id="event-title" placeholder="Nome do evento">
                     </div>
                     <div class="form-group">
-                        <label for="event-date">Data</label>
-                        <input type="date" id="event-date">
-                    </div>
-                    <div class="form-group">
-                        <label for="event-time">Hora (opcional)</label>
-                        <input type="time" id="event-time">
+                        <label for="event-desc">Descrição (opcional)</label>
+                        <textarea id="event-desc" placeholder="Detalhes do evento"></textarea>
                     </div>
                     <div class="form-group">
                         <label>Cor do evento</label>
@@ -417,10 +469,6 @@
                             <div class="color-option" style="background-color: #00bcd4;" data-color="#00bcd4"></div>
                         </div>
                         <input type="color" id="custom-color-input" value="#6d5dfc" style="width: 100%; margin-top: 10px; height: 40px;">
-                    </div>
-                    <div class="form-group">
-                        <label for="event-desc">Descrição (opcional)</label>
-                        <textarea id="event-desc" placeholder="Detalhes do evento"></textarea>
                     </div>
                     <button class="btn" id="save-event">Salvar Evento</button>
                     <button class="btn btn-delete" id="delete-event" style="display: none;">Excluir Evento</button>
@@ -438,7 +486,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="js/common.js"></script>
     <script>
-        // schedule.js - Lógica da agenda simplificada
+        // schedule.js - Lógica do cronograma diário
 
         // Verificar se o Firebase foi inicializado
         function checkFirebaseInitialization() {
@@ -463,34 +511,31 @@
         }
 
         // Variáveis globais
-        let currentDate = new Date();
-        let currentMonth = currentDate.getMonth();
-        let currentYear = currentDate.getFullYear();
+        let selectedDate = new Date();
         let selectedEventId = null;
         let selectedColor = '#6d5dfc';
+        let selectedTime = '08:00';
 
         // Elementos do DOM
-        const currentMonthElement = document.getElementById('current-month');
-        const prevMonthButton = document.getElementById('prev-month');
-        const nextMonthButton = document.getElementById('next-month');
+        const selectedDateElement = document.getElementById('selected-date');
+        const dayTitleElement = document.getElementById('day-title');
+        const prevDayButton = document.getElementById('prev-day');
+        const nextDayButton = document.getElementById('next-day');
         const todayButton = document.getElementById('today-btn');
-        const calendarContainer = document.getElementById('calendar');
-        const eventDateInput = document.getElementById('event-date');
-        const eventTimeInput = document.getElementById('event-time');
+        const datePicker = document.getElementById('date-picker');
+        const timeSlotsContainer = document.getElementById('time-slots');
+        const eventTimeSelect = document.getElementById('event-time');
         const eventTitleInput = document.getElementById('event-title');
         const eventDescInput = document.getElementById('event-desc');
         const saveEventButton = document.getElementById('save-event');
         const deleteEventButton = document.getElementById('delete-event');
-        const eventsContainer = document.getElementById('events-container');
         const formTitle = document.getElementById('form-title');
         const colorOptions = document.querySelectorAll('.color-option');
         const customColorInput = document.getElementById('custom-color-input');
 
-        // Nomes dos meses
-        const monthNames = [
-            "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-        ];
+        // Nomes dos dias da semana
+        const dayNames = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
@@ -500,6 +545,7 @@
                 })
                 .catch((error) => {
                     console.error("Erro na inicialização do Firebase:", error);
+                    alert("Erro ao conectar com o banco de dados. Verifique o console para detalhes.");
                 });
         });
 
@@ -507,16 +553,20 @@
             // Definir data atual como padrão
             const today = new Date();
             const formattedToday = today.toISOString().split('T')[0];
-            eventDateInput.value = formattedToday;
+            datePicker.value = formattedToday;
             
-            // Renderizar o calendário
-            renderCalendar();
-            loadEvents();
+            // Preencher seleção de horários
+            populateTimeOptions();
+            
+            // Renderizar o cronograma do dia
+            renderDayView();
+            loadDayEvents();
             
             // Event Listeners
-            prevMonthButton.addEventListener('click', goToPreviousMonth);
-            nextMonthButton.addEventListener('click', goToNextMonth);
+            prevDayButton.addEventListener('click', goToPreviousDay);
+            nextDayButton.addEventListener('click', goToNextDay);
             todayButton.addEventListener('click', goToToday);
+            datePicker.addEventListener('change', handleDateChange);
             
             saveEventButton.addEventListener('click', saveEvent);
             deleteEventButton.addEventListener('click', deleteEvent);
@@ -532,128 +582,126 @@
                 selectColor(this.value);
             });
             
-            // Listener para seleção de data no calendário
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('day-number')) {
-                    const day = parseInt(e.target.textContent);
-                    selectDate(day);
-                }
+            // Listener para seleção de horário no formulário
+            eventTimeSelect.addEventListener('change', function() {
+                selectedTime = this.value;
             });
         }
 
-        // Função para renderizar o calendário
-        function renderCalendar() {
-            // Atualizar o cabeçalho com o mês/ano atual
-            currentMonthElement.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        // Preencher opções de horário
+        function populateTimeOptions() {
+            eventTimeSelect.innerHTML = '';
             
-            // Limpar o calendário (exceto os cabeçalhos dos dias)
-            const dayHeaders = document.querySelectorAll('.day-header');
-            calendarContainer.innerHTML = '';
-            dayHeaders.forEach(header => calendarContainer.appendChild(header));
-            
-            // Obter o primeiro dia do mês e o último dia do mês
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            const startDay = firstDay.getDay();
-            
-            // Dias do mês anterior
-            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
-            for (let i = startDay - 1; i >= 0; i--) {
-                const day = createDayElement(prevMonthLastDay - i, true);
-                calendarContainer.appendChild(day);
+            for (let hour = 6; hour <= 22; hour++) {
+                for (let minute = 0; minute < 60; minute += 30) {
+                    const timeValue = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    const option = document.createElement('option');
+                    option.value = timeValue;
+                    option.textContent = timeValue;
+                    eventTimeSelect.appendChild(option);
+                }
             }
             
-            // Dias do mês atual
-            const today = new Date();
-            for (let i = 1; i <= daysInMonth; i++) {
-                const isToday = i === today.getDate() && 
-                               currentMonth === today.getMonth() && 
-                               currentYear === today.getFullYear();
-                const day = createDayElement(i, false, isToday);
-                calendarContainer.appendChild(day);
-            }
+            // Definir horário padrão
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes() < 30 ? '00' : '30';
+            selectedTime = `${currentHour.toString().padStart(2, '0')}:${currentMinute}`;
+            eventTimeSelect.value = selectedTime;
+        }
+
+        // Função para renderizar a visualização do dia
+        function renderDayView() {
+            // Atualizar o cabeçalho com a data selecionada
+            updateDateDisplay();
             
-            // Dias do próximo mês
-            const totalCells = 42; // 6 semanas * 7 dias
-            const remainingCells = totalCells - (startDay + daysInMonth);
-            for (let i = 1; i <= remainingCells; i++) {
-                const day = createDayElement(i, true);
-                calendarContainer.appendChild(day);
+            // Limpar os slots de tempo
+            timeSlotsContainer.innerHTML = '';
+            
+            // Gerar slots de tempo (das 6h às 22h)
+            for (let hour = 6; hour <= 22; hour++) {
+                for (let minute = 0; minute < 60; minute += 30) {
+                    const timeValue = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    
+                    const timeSlot = document.createElement('div');
+                    timeSlot.className = 'time-slot';
+                    timeSlot.setAttribute('data-time', timeValue);
+                    
+                    timeSlot.innerHTML = `
+                        <div class="time-label">${timeValue}</div>
+                        <div class="event-content empty" data-time="${timeValue}">Clique para adicionar evento</div>
+                        <button class="add-event-btn" data-time="${timeValue}">+</button>
+                    `;
+                    
+                    // Event listeners
+                    const eventContent = timeSlot.querySelector('.event-content');
+                    const addButton = timeSlot.querySelector('.add-event-btn');
+                    
+                    eventContent.addEventListener('click', function() {
+                        const time = this.getAttribute('data-time');
+                        editEventAtTime(time);
+                    });
+                    
+                    addButton.addEventListener('click', function() {
+                        const time = this.getAttribute('data-time');
+                        addEventAtTime(time);
+                    });
+                    
+                    timeSlotsContainer.appendChild(timeSlot);
+                }
             }
         }
 
-        // Função para criar elemento de dia
-        function createDayElement(dayNumber, isOtherMonth, isToday = false) {
-            const dayElement = document.createElement('div');
-            dayElement.className = 'day';
+        // Função para atualizar o display da data
+        function updateDateDisplay() {
+            const dayName = dayNames[selectedDate.getDay()];
+            const day = selectedDate.getDate();
+            const month = monthNames[selectedDate.getMonth()];
+            const year = selectedDate.getFullYear();
             
-            if (isOtherMonth) {
-                dayElement.classList.add('other-month');
-            }
+            selectedDateElement.textContent = `${day} de ${month} de ${year}`;
+            dayTitleElement.textContent = `${dayName}, ${day} de ${month} de ${year}`;
             
-            if (isToday) {
-                dayElement.classList.add('today');
-            }
-            
-            const dayNumberElement = document.createElement('div');
-            dayNumberElement.className = 'day-number';
-            dayNumberElement.textContent = dayNumber;
-            
-            dayElement.appendChild(dayNumberElement);
-            
-            // Adicionar data attribute para identificação
-            const fullDate = new Date(currentYear, currentMonth, dayNumber);
-            const dateString = fullDate.toISOString().split('T')[0];
-            dayElement.setAttribute('data-date', dateString);
-            
-            return dayElement;
+            // Atualizar o date picker
+            const formattedDate = selectedDate.toISOString().split('T')[0];
+            datePicker.value = formattedDate;
         }
 
-        // Função para navegar para o mês anterior
-        function goToPreviousMonth() {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            renderCalendar();
-            loadEvents();
+        // Função para navegar para o dia anterior
+        function goToPreviousDay() {
+            selectedDate.setDate(selectedDate.getDate() - 1);
+            renderDayView();
+            loadDayEvents();
         }
 
-        // Função para navegar para o próximo mês
-        function goToNextMonth() {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            renderCalendar();
-            loadEvents();
+        // Função para navegar para o próximo dia
+        function goToNextDay() {
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            renderDayView();
+            loadDayEvents();
         }
 
         // Função para navegar para a data atual
         function goToToday() {
-            currentDate = new Date();
-            currentMonth = currentDate.getMonth();
-            currentYear = currentDate.getFullYear();
-            renderCalendar();
-            loadEvents();
-            
-            // Definir data atual no formulário
-            const formattedToday = currentDate.toISOString().split('T')[0];
-            eventDateInput.value = formattedToday;
+            selectedDate = new Date();
+            renderDayView();
+            loadDayEvents();
         }
 
-        // Função para selecionar uma data
-        function selectDate(day) {
-            const selectedDate = new Date(currentYear, currentMonth, day);
-            const formattedDate = selectedDate.toISOString().split('T')[0];
-            eventDateInput.value = formattedDate;
+        // Função para lidar com mudança de data no date picker
+        function handleDateChange() {
+            selectedDate = new Date(this.value);
+            renderDayView();
+            loadDayEvents();
+        }
+
+        // Função para adicionar evento em um horário específico
+        function addEventAtTime(time) {
+            selectedTime = time;
+            eventTimeSelect.value = time;
             
             // Limpar formulário
             eventTitleInput.value = '';
-            eventTimeInput.value = '';
             eventDescInput.value = '';
             selectedEventId = null;
             deleteEventButton.style.display = 'none';
@@ -661,6 +709,45 @@
             
             // Selecionar cor padrão
             selectColor('#6d5dfc');
+            
+            // Scroll para o formulário
+            eventTimeSelect.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Função para editar evento em um horário específico
+        function editEventAtTime(time) {
+            // Buscar evento neste horário
+            const formattedDate = selectedDate.toISOString().split('T')[0];
+            const eventKey = `${formattedDate}_${time.replace(':', '')}`;
+            
+            db.collection('daily_schedule').doc(eventKey).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const event = doc.data();
+                        selectedTime = event.time;
+                        eventTimeSelect.value = event.time;
+                        eventTitleInput.value = event.title;
+                        eventDescInput.value = event.description || '';
+                        
+                        selectedEventId = eventKey;
+                        deleteEventButton.style.display = 'inline-block';
+                        formTitle.textContent = 'Editar Evento';
+                        
+                        // Selecionar a cor do evento
+                        if (event.color) {
+                            selectColor(event.color);
+                        }
+                        
+                        // Scroll para o formulário
+                        eventTimeSelect.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        // Se não existir evento, criar um novo
+                        addEventAtTime(time);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar evento: ", error);
+                });
         }
 
         // Função para selecionar uma cor
@@ -678,133 +765,58 @@
             });
         }
 
-        // Função para carregar eventos do Firebase
-        function loadEvents() {
-            // Limpar eventos existentes no calendário
-            document.querySelectorAll('.event-item').forEach(el => {
-                el.remove();
-            });
+        // Função para carregar eventos do dia
+        function loadDayEvents() {
+            const formattedDate = selectedDate.toISOString().split('T')[0];
             
-            // Calcular datas de início e fim do mês
-            const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
-            const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
-            
-            // Buscar eventos do mês
-            db.collection('agenda_events')
-                .where('date', '>=', firstDayOfMonth.toISOString().split('T')[0])
-                .where('date', '<=', lastDayOfMonth.toISOString().split('T')[0])
+            // Buscar eventos do dia
+            db.collection('daily_schedule')
+                .where('date', '==', formattedDate)
                 .get()
                 .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        const event = doc.data();
-                        displayEventOnCalendar(event, doc.id);
+                    // Limpar todos os eventos visuais primeiro
+                    document.querySelectorAll('.event-content').forEach(el => {
+                        el.className = 'event-content empty';
+                        el.textContent = 'Clique para adicionar evento';
                     });
                     
-                    // Atualizar lista de eventos
-                    updateEventsList(querySnapshot);
+                    // Preencher com os eventos do banco
+                    querySnapshot.forEach((doc) => {
+                        const event = doc.data();
+                        displayEventOnSchedule(event);
+                    });
                 })
                 .catch((error) => {
                     console.error("Erro ao carregar eventos: ", error);
                 });
         }
 
-        // Função para exibir evento no calendário
-        function displayEventOnCalendar(event, id) {
-            const eventDate = new Date(event.date);
-            const dayNumber = eventDate.getDate();
-            
-            // Encontrar o elemento do dia correto
-            const dayElement = document.querySelector(`.day[data-date="${event.date}"]`);
-            
-            if (dayElement && eventDate.getMonth() === currentMonth) {
-                const eventElement = document.createElement('div');
-                eventElement.className = 'event-item';
-                eventElement.style.backgroundColor = event.color || '#6d5dfc';
-                eventElement.textContent = event.title;
-                eventElement.setAttribute('data-event-id', id);
-                
-                eventElement.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    editEvent(id);
-                });
-                
-                dayElement.appendChild(eventElement);
+        // Função para exibir evento no cronograma
+        function displayEventOnSchedule(event) {
+            const timeSlot = document.querySelector(`.event-content[data-time="${event.time}"]`);
+            if (timeSlot) {
+                timeSlot.className = 'event-content';
+                timeSlot.style.backgroundColor = event.color || '#6d5dfc';
+                timeSlot.textContent = event.title;
+                timeSlot.setAttribute('data-event-id', `${event.date}_${event.time.replace(':', '')}`);
             }
-        }
-
-        // Função para atualizar a lista de eventos
-        function updateEventsList(querySnapshot) {
-            eventsContainer.innerHTML = '';
-            
-            if (querySnapshot.empty) {
-                eventsContainer.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-plus"></i><p>Nenhum evento este mês</p></div>';
-                return;
-            }
-            
-            // Agrupar eventos por data
-            const eventsByDate = {};
-            
-            querySnapshot.forEach((doc) => {
-                const event = doc.data();
-                if (!eventsByDate[event.date]) {
-                    eventsByDate[event.date] = [];
-                }
-                eventsByDate[event.date].push({...event, id: doc.id});
-            });
-            
-            // Ordenar datas
-            const sortedDates = Object.keys(eventsByDate).sort();
-            
-            // Exibir eventos agrupados por data
-            sortedDates.forEach(date => {
-                const dateObj = new Date(date);
-                const dateFormatted = dateObj.toLocaleDateString('pt-BR', { 
-                    weekday: 'long', 
-                    day: 'numeric', 
-                    month: 'long' 
-                });
-                
-                const dateHeader = document.createElement('h4');
-                dateHeader.textContent = dateFormatted;
-                dateHeader.style.marginTop = '15px';
-                dateHeader.style.color = '#6d5dfc';
-                eventsContainer.appendChild(dateHeader);
-                
-                eventsByDate[date].forEach(event => {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = 'event-card';
-                    eventElement.style.borderLeftColor = event.color || '#6d5dfc';
-                    
-                    eventElement.innerHTML = `
-                        <div class="event-title">${event.title}</div>
-                        ${event.time ? `<div class="event-date">${event.time}</div>` : ''}
-                        ${event.description ? `<div class="event-date">${event.description}</div>` : ''}
-                        <div class="event-actions">
-                            <button class="btn" onclick="editEvent('${event.id}')">Editar</button>
-                            <button class="btn btn-delete" onclick="deleteEvent('${event.id}')">Excluir</button>
-                        </div>
-                    `;
-                    
-                    eventsContainer.appendChild(eventElement);
-                });
-            });
         }
 
         // Função para salvar evento
         function saveEvent() {
-            const date = eventDateInput.value;
-            const time = eventTimeInput.value;
+            const time = eventTimeSelect.value;
             const title = eventTitleInput.value;
             const description = eventDescInput.value;
             const color = selectedColor;
+            const formattedDate = selectedDate.toISOString().split('T')[0];
             
-            if (!date || !title) {
-                alert('Por favor, preencha pelo menos a data e o título do evento.');
+            if (!time || !title) {
+                alert('Por favor, preencha pelo menos o horário e o título do evento.');
                 return;
             }
             
             const eventData = {
-                date: date,
+                date: formattedDate,
                 time: time,
                 title: title,
                 description: description,
@@ -812,13 +824,15 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
+            const eventKey = `${formattedDate}_${time.replace(':', '')}`;
+            
             if (selectedEventId) {
                 // Atualizar evento existente
-                db.collection('agenda_events').doc(selectedEventId).update(eventData)
+                db.collection('daily_schedule').doc(selectedEventId).update(eventData)
                     .then(() => {
                         alert('Evento atualizado com sucesso!');
                         resetForm();
-                        loadEvents();
+                        loadDayEvents();
                     })
                     .catch((error) => {
                         console.error("Erro ao atualizar evento: ", error);
@@ -826,11 +840,11 @@
                     });
             } else {
                 // Adicionar novo evento
-                db.collection('agenda_events').add(eventData)
+                db.collection('daily_schedule').doc(eventKey).set(eventData)
                     .then(() => {
                         alert('Evento adicionado com sucesso!');
                         resetForm();
-                        loadEvents();
+                        loadDayEvents();
                     })
                     .catch((error) => {
                         console.error("Erro ao adicionar evento: ", error);
@@ -839,48 +853,19 @@
             }
         }
 
-        // Função para editar evento
-        function editEvent(eventId) {
-            db.collection('agenda_events').doc(eventId).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const event = doc.data();
-                        eventDateInput.value = event.date;
-                        eventTimeInput.value = event.time || '';
-                        eventTitleInput.value = event.title;
-                        eventDescInput.value = event.description || '';
-                        
-                        selectedEventId = eventId;
-                        deleteEventButton.style.display = 'inline-block';
-                        formTitle.textContent = 'Editar Evento';
-                        
-                        // Selecionar a cor do evento
-                        if (event.color) {
-                            selectColor(event.color);
-                        }
-                    }
-                })
-                .catch((error) => {
-                    console.error("Erro ao carregar evento: ", error);
-                    alert('Erro ao carregar evento. Tente novamente.');
-                });
-        }
-
         // Função para excluir evento
-        function deleteEvent(eventId = null) {
-            const idToDelete = eventId || selectedEventId;
-            
-            if (!idToDelete) {
+        function deleteEvent() {
+            if (!selectedEventId) {
                 alert('Nenhum evento selecionado para exclusão.');
                 return;
             }
             
             if (confirm('Tem certeza que deseja excluir este evento?')) {
-                db.collection('agenda_events').doc(idToDelete).delete()
+                db.collection('daily_schedule').doc(selectedEventId).delete()
                     .then(() => {
                         alert('Evento excluído com sucesso!');
                         resetForm();
-                        loadEvents();
+                        loadDayEvents();
                     })
                     .catch((error) => {
                         console.error("Erro ao excluir evento: ", error);
@@ -891,11 +876,12 @@
 
         // Função para reiniciar o formulário
         function resetForm() {
-            const today = new Date();
-            const formattedToday = today.toISOString().split('T')[0];
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes() < 30 ? '00' : '30';
+            selectedTime = `${currentHour.toString().padStart(2, '0')}:${currentMinute}`;
             
-            eventDateInput.value = formattedToday;
-            eventTimeInput.value = '';
+            eventTimeSelect.value = selectedTime;
             eventTitleInput.value = '';
             eventDescInput.value = '';
             
