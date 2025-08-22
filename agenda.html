@@ -603,7 +603,7 @@
         function populateTimeOptions() {
             eventTimeSelect.innerHTML = '';
             
-            // Alterado: hora inicial de 5 para 5 e final de 22 para 23
+            // Das 5:00 às 23:30
             for (let hour = 5; hour <= 23; hour++) {
                 for (let minute = 0; minute < 60; minute += 30) {
                     const timeValue = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
@@ -636,7 +636,7 @@
             // Limpar os slots de tempo
             timeSlotsContainer.innerHTML = '';
             
-            // Alterado: hora inicial de 5 para 5 e final de 22 para 23
+            // Das 5:00 às 23:30
             for (let hour = 5; hour <= 23; hour++) {
                 for (let minute = 0; minute < 60; minute += 30) {
                     const timeValue = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
@@ -708,7 +708,7 @@
             
             // Verificar se é dia de semana
             if (isWeekday(selectedDate)) {
-                // Criar evento fixo das 10:00 às 14:00
+                // Criar evento fixo das 10:00 às 14:00 (Trabalho)
                 for (let hour = 10; hour < 14; hour++) {
                     for (let minute = 0; minute < 60; minute += 30) {
                         const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
@@ -725,6 +725,42 @@
                                         title: "Trabalho",
                                         description: "Horário de trabalho fixo",
                                         color: "#4caf50", // Verde
+                                        isFixed: true,
+                                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                    };
+                                    
+                                    db.collection('daily_schedule').doc(eventKey).set(eventData)
+                                        .catch((error) => {
+                                            console.error("Erro ao criar evento fixo: ", error);
+                                        });
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Erro ao verificar evento fixo: ", error);
+                            });
+                    }
+                }
+                
+                // Criar evento fixo das 18:00 às 21:30 (Também Trabalho)
+                for (let hour = 18; hour <= 21; hour++) {
+                    // Para a hora 21, só vamos até 21:30
+                    const maxMinute = hour === 21 ? 30 : 59;
+                    
+                    for (let minute = 0; minute <= maxMinute; minute += 30) {
+                        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                        const eventKey = `${formattedDate}_${time.replace(':', '')}`;
+                        
+                        // Verificar se o evento já existe
+                        db.collection('daily_schedule').doc(eventKey).get()
+                            .then((doc) => {
+                                if (!doc.exists) {
+                                    // Criar evento fixo
+                                    const eventData = {
+                                        date: formattedDate,
+                                        time: time,
+                                        title: "Trabalho", // Mesmo título
+                                        description: "Horário de trabalho fixo",
+                                        color: "#4caf50", // Mesma cor verde
                                         isFixed: true,
                                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                                     };
@@ -818,7 +854,7 @@
                         
                         // Verificar se é um evento fixo
                         if (event.isFixed) {
-                            alert("Este é um evento fixo e não pode ser editado.");
+                            alert("Este é um evento fixo e não pode be edited.");
                             return;
                         }
                         
