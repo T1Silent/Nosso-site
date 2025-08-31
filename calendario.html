@@ -497,8 +497,10 @@
             
             // Definir data atual como padrão no formulário
             const today = new Date();
-            const formattedToday = today.toISOString().split('T')[0];
-            eventDateInput.value = formattedToday;
+            // Ajustar para o fuso horário local
+            const offset = today.getTimezoneOffset();
+            today.setMinutes(today.getMinutes() - offset);
+            eventDateInput.value = today.toISOString().split('T')[0];
         }
         
         // Renderizar calendário
@@ -589,9 +591,13 @@
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
             const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
             
+            // Ajustar para o fuso horário local
+            const firstDayStr = firstDayOfMonth.toISOString().split('T')[0];
+            const lastDayStr = lastDayOfMonth.toISOString().split('T')[0];
+            
             db.collection('events')
-                .where('date', '>=', firstDayOfMonth.toISOString().split('T')[0])
-                .where('date', '<=', lastDayOfMonth.toISOString().split('T')[0])
+                .where('date', '>=', firstDayStr)
+                .where('date', '<=', lastDayStr)
                 .get()
                 .then((querySnapshot) => {
                     loadingEvents.style.display = 'none';
@@ -606,10 +612,14 @@
                 });
                 
             // Carregar próximos eventos
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            // Ajustar para o fuso horário local
+            const offset = today.getTimezoneOffset();
+            today.setMinutes(today.getMinutes() - offset);
+            const todayStr = today.toISOString().split('T')[0];
             
             db.collection('events')
-                .where('date', '>=', today)
+                .where('date', '>=', todayStr)
                 .orderBy('date')
                 .limit(5)
                 .get()
@@ -660,6 +670,10 @@
         
         // Exibir evento na lista
         function displayEventInList(event, id) {
+            // Corrigir a data para exibição - ajustar para o fuso horário local
+            const dateParts = event.date.split('-');
+            const eventDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+            
             const eventCard = document.createElement('div');
             eventCard.className = 'event-card';
             eventCard.innerHTML = `
@@ -674,10 +688,17 @@
             eventsContainer.appendChild(eventCard);
         }
         
-        // Formatar data para exibição
+        // Formatar data para exibição - corrigido para fuso horário local
         function formatDate(dateString) {
+            const dateParts = dateString.split('-');
+            const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+            
+            // Ajustar para o fuso horário local
+            const offset = date.getTimezoneOffset();
+            date.setMinutes(date.getMinutes() + offset);
+            
             const options = { day: 'numeric', month: 'long', year: 'numeric' };
-            return new Date(dateString).toLocaleDateString('pt-BR', options);
+            return date.toLocaleDateString('pt-BR', options);
         }
         
         // Salvar evento
@@ -776,10 +797,11 @@
             deleteEventButton.style.display = 'none';
             formTitle.textContent = 'Adicionar novo evento';
             
-            // Definir data atual como padrão
+            // Definir data atual como padrão, ajustando para o fuso horário local
             const today = new Date();
-            const formattedToday = today.toISOString().split('T')[0];
-            eventDateInput.value = formattedToday;
+            const offset = today.getTimezoneOffset();
+            today.setMinutes(today.getMinutes() - offset);
+            eventDateInput.value = today.toISOString().split('T')[0];
         }
     </script>
 </body>

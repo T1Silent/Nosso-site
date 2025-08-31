@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda - Nossas Metas, Loirinha!</title>
+    <title>Agenda 2 - Nossas Metas, Matt!</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -421,14 +421,14 @@
         <header>
             <a href="index.html" class="back-btn">← Voltar</a>
             <h1>Que todas as nossas metas sejam possíveis!</h1>
-            <p>Agenda, Loirinha!</p>
+            <p>Nosso cronograma diário - Agenda Matt!</p>
         </header>
         
         <div class="tabs">
             <div class="tab" onclick="location.href='fotos.html'">Fotos</div>
             <div class="tab" onclick="location.href='lista.html'">Lista</div>
             <div class="tab" onclick="location.href='calendario.html'">Calendário</div>
-            <div class="tab active">Cronograma</div>
+            <div class="tab active">Cronograma 2</div>
         </div>
         
         <div class="agenda-container">
@@ -497,7 +497,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="js/common.js"></script>
     <script>
-        // schedule.js - Lógica do cronograma diário
+        // schedule2.js - Lógica do cronograma diário para Agenda 2
 
         // Verificar se o Firebase foi inicializado
         function checkFirebaseInitialization() {
@@ -710,20 +710,21 @@
             return day >= 1 && day <= 5; // 1 = segunda, 5 = sexta
         }
 
-        // Função para criar eventos fixos
+        // Função para criar eventos fixos - AGENDA 2
         function createFixedEvents() {
             const formattedDate = formatDateLocal(selectedDate);
             
             // Verificar se é dia de semana (segunda a sexta)
             if (isWeekday(selectedDate)) {
-                // Criar evento fixo das 10:00 às 14:00 (Trabalho)
-                for (let hour = 10; hour < 14; hour++) {
-                    for (let minute = 0; minute < 60; minute += 30) {
-                        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                // Criar evento fixo das 07:30 às 16:30 (Trabalho) - AGENDA 2
+                for (let hour = 7; hour <= 16; hour++) {
+                    // Para a hora 7, só adicionamos o horário das 7:30
+                    if (hour === 7) {
+                        const time = "07:30";
                         const eventKey = `${formattedDate}_${time.replace(':', '')}`;
                         
-                        // Verificar se o evento já existe
-                        db.collection('daily_schedule').doc(eventKey).get()
+                        // Verificar se o evento já existe na coleção da AGENDA 2
+                        db.collection('daily_schedule_agenda2').doc(eventKey).get()
                             .then((doc) => {
                                 if (!doc.exists) {
                                     // Criar evento fixo
@@ -731,13 +732,13 @@
                                         date: formattedDate,
                                         time: time,
                                         title: "Trabalho",
-                                        description: "Horário de trabalho fixo",
+                                        description: "Horário de trabalho fixo - Agenda 2",
                                         color: "#4caf50", // Verde
                                         isFixed: true,
                                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                                     };
                                     
-                                    db.collection('daily_schedule').doc(eventKey).set(eventData)
+                                    db.collection('daily_schedule_agenda2').doc(eventKey).set(eventData)
                                         .catch((error) => {
                                             console.error("Erro ao criar evento fixo: ", error);
                                         });
@@ -746,42 +747,40 @@
                             .catch((error) => {
                                 console.error("Erro ao verificar evento fixo: ", error);
                             });
-                    }
-                }
-                
-                // Criar evento fixo das 18:00 às 21:30 (Também Trabalho)
-                for (let hour = 18; hour <= 21; hour++) {
-                    // Para a hora 21, só vamos até 21:30
-                    const maxMinute = hour === 21 ? 30 : 59;
-                    
-                    for (let minute = 0; minute <= maxMinute; minute += 30) {
-                        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                        const eventKey = `${formattedDate}_${time.replace(':', '')}`;
-                        
-                        // Verificar se o evento já existe
-                        db.collection('daily_schedule').doc(eventKey).get()
-                            .then((doc) => {
-                                if (!doc.exists) {
-                                    // Criar evento fixo
-                                    const eventData = {
-                                        date: formattedDate,
-                                        time: time,
-                                        title: "Trabalho", // Mesmo título
-                                        description: "Horário de trabalho fixo",
-                                        color: "#4caf50", // Mesma cor verde
-                                        isFixed: true,
-                                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                                    };
-                                    
-                                    db.collection('daily_schedule').doc(eventKey).set(eventData)
-                                        .catch((error) => {
-                                            console.error("Erro ao criar evento fixo: ", error);
-                                        });
-                                }
-                            })
-                            .catch((error) => {
-                                console.error("Erro ao verificar evento fixo: ", error);
-                            });
+                    } else {
+                        // Para outras horas, adicionamos ambos os horários (00 e 30)
+                        for (let minute = 0; minute < 60; minute += 30) {
+                            // Para a hora 16, só vamos até 16:30
+                            if (hour === 16 && minute > 30) break;
+                            
+                            const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                            const eventKey = `${formattedDate}_${time.replace(':', '')}`;
+                            
+                            // Verificar se o evento já existe na coleção da AGENDA 2
+                            db.collection('daily_schedule_agenda2').doc(eventKey).get()
+                                .then((doc) => {
+                                    if (!doc.exists) {
+                                        // Criar evento fixo
+                                        const eventData = {
+                                            date: formattedDate,
+                                            time: time,
+                                            title: "Trabalho",
+                                            description: "Horário de trabalho fixo - Agenda 2",
+                                            color: "#4caf50", // Verde
+                                            isFixed: true,
+                                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                        };
+                                        
+                                        db.collection('daily_schedule_agenda2').doc(eventKey).set(eventData)
+                                            .catch((error) => {
+                                                console.error("Erro ao criar evento fixo: ", error);
+                                            });
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error("Erro ao verificar evento fixo: ", error);
+                                });
+                        }
                     }
                 }
             }
@@ -851,11 +850,11 @@
 
         // Função para editar evento em um horário específico
         function editEventAtTime(time) {
-            // Buscar evento neste horário
+            // Buscar evento neste horário na coleção da AGENDA 2
             const formattedDate = formatDateLocal(selectedDate);
             const eventKey = `${formattedDate}_${time.replace(':', '')}`;
             
-            db.collection('daily_schedule').doc(eventKey).get()
+            db.collection('daily_schedule_agenda2').doc(eventKey).get()
                 .then((doc) => {
                     if (doc.exists) {
                         const event = doc.data();
@@ -914,8 +913,8 @@
             // Criar eventos fixos para dias de semana
             createFixedEvents();
             
-            // Buscar eventos do dia
-            db.collection('daily_schedule')
+            // Buscar eventos do dia na coleção da AGENDA 2
+            db.collection('daily_schedule_agenda2')
                 .where('date', '==', formattedDate)
                 .get()
                 .then((querySnapshot) => {
@@ -978,8 +977,8 @@
             const eventKey = `${formattedDate}_${time.replace(':', '')}`;
             
             if (selectedEventId) {
-                // Atualizar evento existente
-                db.collection('daily_schedule').doc(selectedEventId).update(eventData)
+                // Atualizar evento existente na coleção da AGENDA 2
+                db.collection('daily_schedule_agenda2').doc(selectedEventId).update(eventData)
                     .then(() => {
                         alert('Evento atualizado com sucesso!');
                         resetForm();
@@ -990,8 +989,8 @@
                         alert('Erro ao atualizar evento. Tente novamente.');
                     });
             } else {
-                // Adicionar novo evento
-                db.collection('daily_schedule').doc(eventKey).set(eventData)
+                // Adicionar novo evento na coleção da AGENDA 2
+                db.collection('daily_schedule_agenda2').doc(eventKey).set(eventData)
                     .then(() => {
                         alert('Evento adicionado com sucesso!');
                         resetForm();
@@ -1012,7 +1011,8 @@
             }
             
             if (confirm('Tem certeza que deseja excluir este evento?')) {
-                db.collection('daily_schedule').doc(selectedEventId).delete()
+                // Excluir evento da coleção da AGENDA 2
+                db.collection('daily_schedule_agenda2').doc(selectedEventId).delete()
                     .then(() => {
                         alert('Evento excluído com sucesso!');
                         resetForm();
