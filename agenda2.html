@@ -499,27 +499,37 @@
     <script>
         // schedule2.js - Lógica do cronograma diário para Agenda 2
 
-        // Verificar se o Firebase foi inicializado
-        function checkFirebaseInitialization() {
-            return new Promise((resolve, reject) => {
-                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+        // Verificar se o Firebase foi inicializado e autenticado
+function checkFirebaseInitialization() {
+    return new Promise((resolve, reject) => {
+        // Verificar se o Firebase já foi inicializado
+        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+            // Verificar se já está autenticado
+            if (firebase.auth().currentUser) {
+                resolve();
+                return;
+            }
+            
+            // Esperar pela autenticação
+            const authListener = firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    authListener(); // Remover o listener
                     resolve();
-                    return;
                 }
-                
-                let attempts = 0;
-                const checkInterval = setInterval(() => {
-                    attempts++;
-                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-                        clearInterval(checkInterval);
-                        resolve();
-                    } else if (attempts > 10) {
-                        clearInterval(checkInterval);
-                        reject(new Error('Firebase não foi inicializado. Verifique o common.js.'));
-                    }
-                }, 100);
             });
+            
+            // Tentar autenticação anônima se não estiver autenticado
+            firebase.auth().signInAnonymously()
+                .catch((error) => {
+                    console.error('Erro na autenticação:', error);
+                    reject(error);
+                });
+                
+        } else {
+            reject(new Error('Firebase não foi inicializado. Verifique o common.js.'));
         }
+    });
+}
 
         // Variáveis globais
         let selectedDate = new Date();
@@ -1044,4 +1054,5 @@
         }
     </script>
 </body>
+
 </html>
