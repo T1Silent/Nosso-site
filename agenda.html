@@ -500,34 +500,34 @@
     <script>
         // schedule.js - Lógica do cronograma diário
 
-        // Verificar se o Firebase foi inicializado e autenticado
+        // Verificar se o Firebase foi inicializado (Versão Simplificada)
 function checkFirebaseInitialization() {
     return new Promise((resolve, reject) => {
-        // Verificar se o Firebase já foi inicializado
-        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-            // Verificar se já está autenticado
-            if (firebase.auth().currentUser) {
+        // Verificar se o Firebase e os serviços estão disponíveis
+        if (typeof firebase !== 'undefined' && 
+            typeof db !== 'undefined' && 
+            firebase.apps.length > 0) {
+            
+            // Verificar se estamos autenticados ou aguardar autenticação
+            if (auth.currentUser) {
                 resolve();
-                return;
-            }
-            
-            // Esperar pela autenticação
-            const authListener = firebase.auth().onAuthStateChanged((user) => {
-                if (user) {
-                    authListener(); // Remover o listener
-                    resolve();
-                }
-            });
-            
-            // Tentar autenticação anônima se não estiver autenticado
-            firebase.auth().signInAnonymously()
-                .catch((error) => {
-                    console.error('Erro na autenticação:', error);
-                    reject(error);
+            } else {
+                // Aguardar autenticação
+                const unsubscribe = auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        unsubscribe();
+                        resolve();
+                    }
                 });
                 
+                // Timeout após 10 segundos
+                setTimeout(() => {
+                    unsubscribe();
+                    reject(new Error('Timeout na autenticação'));
+                }, 10000);
+            }
         } else {
-            reject(new Error('Firebase não foi inicializado. Verifique o common.js.'));
+            reject(new Error('Firebase não foi inicializado corretamente'));
         }
     });
 }
@@ -1057,4 +1057,5 @@ function checkFirebaseInitialization() {
 </body>
 
 </html>
+
 
