@@ -1,5 +1,5 @@
-// common.js
-// Configuração do Firebase (substitua com suas próprias configurações)
+/// common.js
+// Configuração do Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyC10Hno92NmmXAW4jN251U1JLRQvRqn60E",
     authDomain: "nosso-site-99c95.firebaseapp.com",
@@ -12,10 +12,23 @@ const firebaseConfig = {
 // Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
-// Funções utilitárias que podem ser usadas em todas as páginas
+// Função para autenticação anônima
+async function initializeFirebase() {
+    try {
+        // Tentar autenticação anônima
+        await auth.signInAnonymously();
+        console.log('Autenticado anonimamente com sucesso');
+        return true;
+    } catch (error) {
+        console.error('Erro na autenticação:', error);
+        return false;
+    }
+}
+
+// Funções utilitárias
 function showMessage(message, type = 'success') {
-    // Criar e exibir uma mensagem para o usuário
     const messageEl = document.createElement('div');
     messageEl.textContent = message;
     messageEl.style.position = 'fixed';
@@ -35,8 +48,20 @@ function showMessage(message, type = 'success') {
     
     document.body.appendChild(messageEl);
     
-    // Remover a mensagem após 3 segundos
     setTimeout(() => {
-        document.body.removeChild(messageEl);
+        if (messageEl.parentNode) {
+            document.body.removeChild(messageEl);
+        }
     }, 3000);
 }
+
+// Adicionar listener para mudanças de autenticação
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log('Usuário autenticado:', user.uid);
+        // Disparar evento customizado quando autenticado
+        window.dispatchEvent(new CustomEvent('firebaseAuthenticated'));
+    } else {
+        console.log('Usuário não autenticado');
+    }
+});
