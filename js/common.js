@@ -1,4 +1,4 @@
-/// common.js
+// common.js - Versão Corrigida
 // Configuração do Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyC10Hno92NmmXAW4jN251U1JLRQvRqn60E",
@@ -9,22 +9,32 @@ const firebaseConfig = {
     appId: "1:173788414642:web:39efd3b0895f89e939ffab"
 };
 
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+// Verificar se o Firebase já foi inicializado
+let db, auth;
 
-// Função para autenticação anônima
-async function initializeFirebase() {
-    try {
-        // Tentar autenticação anônima
-        await auth.signInAnonymously();
-        console.log('Autenticado anonimamente com sucesso');
-        return true;
-    } catch (error) {
-        console.error('Erro na autenticação:', error);
-        return false;
+try {
+    // Inicializar Firebase apenas se não foi inicializado antes
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
     }
+    
+    // Inicializar serviços
+    db = firebase.firestore();
+    auth = firebase.auth();
+    
+    console.log('Firebase inicializado com sucesso');
+    
+    // Tentar autenticação anônima automaticamente
+    auth.signInAnonymously()
+        .then(() => {
+            console.log('Autenticado anonimamente com sucesso');
+        })
+        .catch((error) => {
+            console.error('Erro na autenticação anônima:', error);
+        });
+        
+} catch (error) {
+    console.error('Erro ao inicializar Firebase:', error);
 }
 
 // Funções utilitárias
@@ -54,14 +64,3 @@ function showMessage(message, type = 'success') {
         }
     }, 3000);
 }
-
-// Adicionar listener para mudanças de autenticação
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        console.log('Usuário autenticado:', user.uid);
-        // Disparar evento customizado quando autenticado
-        window.dispatchEvent(new CustomEvent('firebaseAuthenticated'));
-    } else {
-        console.log('Usuário não autenticado');
-    }
-});
